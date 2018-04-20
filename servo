@@ -1,25 +1,44 @@
 #include <Servo.h>
 
-Servo myservo;  // create servo object to control a servo
+Servo myservo; 
 
+int pos = 0; 
+int potPin = analogRead(A0);    
 
-int pos = 0;    // variable to store the servo position
+  
+
 
 void setup() {
-  myservo.attach(7);  // attaches the servo on pin 9 to the servo object
+
+  Serial.begin(9600);
+  myservo.attach(7);
+  myservo.write (0);
 }
 
 void loop() {
- 
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(100);
-   pos = 90;
-    // goes from 180 degrees to 0 degrees
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(100);  
-    pos = 0;
-    myservo.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(100); // waits 15ms for the servo to reach the position
   
+
+int SensorValue = analogRead(potPin);    
+Serial.println(SensorValue);
+delay (1000);
+  if (SensorValue == 0)
+  {
+    //Serial.println("Valor del sensor");
+   // Serial.println(SensorValue);
+   //myservo.write(0);
+    myservo.write(90);
+    delay (5000);
+  }
+  if (SensorValue == 1023)
+   {
+          //Serial.println("Valor del sensor");
+        //  Serial.println(SensorValue);
+        
+          myservo.write(0);
+
+          delay (5000);
+  }
+
+ 
 }
 
