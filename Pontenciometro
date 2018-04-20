@@ -1,0 +1,33 @@
+int potPin = analogRead(A0);    
+//int ledPin3 = 13;
+
+
+void setup() {
+
+  Serial.begin(9600);
+  
+}
+
+void loop() {
+int SensorValue = analogRead(potPin);    
+
+ 
+  if (ensorValue == 0)
+  {
+    Serial.println("Valor del sensor");
+    Serial.println(SensorValue);
+    /*delay (100);
+      if (10 <= SensorValue >= 500)
+        {
+          Serial.println("Valor del sensor");
+          Serial.println(SensorValue);
+          delay (100);
+         }
+ */}
+ /* else 
+    {
+   Serial.println("Valor del sensor");
+   Serial.println(SensorValue);
+   delay (100);
+  } */
+}
