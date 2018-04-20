@@ -17,7 +17,7 @@ int SensorValue = analogRead(potPin);
     Serial.println("Valor del sensor");
     Serial.println(SensorValue);
     /*delay (100);
-      if (10 <= SensorValue >= 500)
+      if (SensorValue >= 500)
         {
           Serial.println("Valor del sensor");
           Serial.println(SensorValue);
