@@ -1,0 +1,204 @@
+//*************************************************************************
+//
+//                      PED CARE - HACKATON HONEYWELL
+//
+//*************************************************************************
+
+#include <SPI.h>
+#include <Ethernet.h>
+#include <LiquidCrystal.h> //libreria para el uso de LCD 20X4
+#include <Servo.h>         //Libreria servomotor
+
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+String readString; //Buffer
+
+//declaracion de las variables y configuraciones de los pins
+const int trigPin = 9;
+const int echoPin = 10;
+const int buzzer = 8;
+int potPin = analogRead(A0);   
+Servo myservo;  // create servo object to control a servo
+int pos = 0;    // variable to store the servo position
+int set1,set2=0;
+
+// defines variables
+long duration;
+int distance;
+
+// Enter a MAC address and IP address for your controller below.
+// The IP address will be dependent on your local network:
+byte mac[] = { 
+  0x98, 0x4F, 0xEE, 0x05, 0x3C, 0xAE };
+  IPAddress ip(169,254,6,173);
+
+// Initialize the Ethernet server library
+// with the IP address and port you want to use 
+// (port 80 is default for HTTP):
+EthernetServer server(8080);
+
+void setup() {
+
+  // set up the LCD's number of columns and rows:
+  lcd.begin(20, 4);
+  
+  //Declaracion de entradas y salidas
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  pinMode(buzzer, OUTPUT); // Sets the echoPin as an Input
+  myservo.attach(7);  // attaches the servo on pin 9 to the servo object 
+  myservo.write(0);
+  
+  //Animacion - mensaje de inicio
+  lcd.setCursor(0, 0);
+  lcd.print("::::::::::::::::::::");
+  lcd.setCursor(0, 1);
+  lcd.print("------PET CARE------");
+  lcd.setCursor(0, 2);
+  lcd.print("::::::::::::::::::::");
+  lcd.setCursor(0, 3);
+  lcd.print("::::::::::::::::::::");
+  delay(2500);
+  
+  // start the Ethernet connection and the server:
+  Ethernet.begin(mac, ip);
+  server.begin();
+    
+}
+
+
+void loop() {
+
+  //Inicializacion
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  //Turn off the buzzer
+  digitalWrite(buzzer, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  // Calculating the distance
+  distance= (duration*0.034/2);
+  delay(100);
+
+if(distance >=13){
+    digitalWrite(buzzer, HIGH);   // turn the buzzer on (HIGH is the voltage level)
+    delay(1000);                       // wait for a second   
+  }
+  
+  // potenciometro y servo
+  int SensorValue = analogRead(potPin);    
+ 
+  if(SensorValue ==0){ 
+    myservo.write(90);              // tell servo to go to position in variable 'pos'
+    delay(1000);                       // waits 15ms for the servo to reach the position
+  }
+  
+  if(SensorValue ==1023){
+    myservo.write(0);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+  
+  clearAllScreen();
+  set1=SensorValue*100.0/1023;
+  set2= 100-(distance*100.0/13);
+  firstScreenText(set1,set2);
+  delay(2000);
+  
+  lcd.clear();
+
+  // listen for incoming clients
+  EthernetClient client = server.available();
+  if (client) {
+    Serial.println("new client");
+    // an http request ends with a blank line
+    boolean currentLineIsBlank = true;
+    while (client.connected()) {
+      if (client.available()) {
+        char c = client.read();
+        Serial.write(c);
+        // if you've gotten to the end of the line (received a newline
+        // character) and the line is blank, the http request has ended,
+        // so you can send a reply
+        if (c == '\n' && currentLineIsBlank) {
+          // send a standard http response header
+                   client.println("<!DOCTYPE HTML>");
+          client.println("<html>");
+          client.print("<head>");
+          client.print("<title>PED CARE</title>");                                                            //Titulo en el navegador
+          client.println("<meta name='apple-mobile-web-app-capable' content='yes' />");
+          client.println("<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />");               //Configuracion para dispositivos APPLE
+          client.println("<link rel='stylesheet' type='text/css' href='http://randomnerdtutorials.com/ethernetcss.css' />"); //Decoracion de links
+
+          
+          // add a meta refresh tag, so the browser pulls again every 15 seconds: (Refrescado de la pagina cada 3 segundos, LIMPIA LA URL)
+          client.println("<meta http-equiv=\"refresh\" content=\"3; url=http://169.254.6.173:8080/ \">"); //IP estatica - NOTA: Configurar siempre
+            
+            //Ajustes de la pagina web, color de fondo, tipo de letra, tamaño, color, titulo.
+            client.print("</head>");
+            client.print("<center>");
+            client.print("<header> <font face= calibri size= 5 color= white > <h1>PED CARE</h1> </header>");
+            client.print("<body bgcolor= #282c30>");
+            
+            client.print("Reserva ");
+            client.print(set2);
+            client.println("<br />");
+            client.print("Plato");
+            client.print(set1);
+            client.println("<br />");
+          
+          client.println("</html>");
+          break;
+        }
+        if (c == '\n') {
+          // you're starting a new line
+          currentLineIsBlank = true;
+        } else if (c != '\r') {
+          // you've gotten a character on the current line
+          currentLineIsBlank = false;
+        }
+      }
+    }
+    // give the web browser time to receive the data
+    delay(1);
+    // close the connection:
+    client.stop();
+  }
+}
+
+  //pantallafuncion
+  void clearLineScreen(int col, int row) {
+  if (col > 20) {
+    col = 20;
+  }
+  if (row > 4) {
+    row = 4;
+  }
+  lcd.setCursor(col, row);
+  for (int i=0; i<20; i++) {
+    lcd.print(' ');
+  }
+  
+}
+
+void clearAllScreen(){
+  clearLineScreen(0, 0);
+  clearLineScreen(0, 1);
+  clearLineScreen(0, 2);
+  clearLineScreen(0, 3);
+}
+ 
+  void firstScreenText(int setPointBowlPercent, int reserveFoodPercent) {
+  lcd.setCursor(0, 0);
+  lcd.print("[-----PET CARE-----]");
+  lcd.setCursor(0, 1);
+  lcd.print("--------------------");
+  lcd.setCursor(0, 2);
+  lcd.print("Setpoint bowl: " + String(setPointBowlPercent) + "%");
+  lcd.setCursor(0, 3);
+  lcd.print("Reserve: " + String(reserveFoodPercent) + "%");
+}
