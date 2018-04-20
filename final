@@ -1,0 +1,120 @@
+#include <Servo.h>
+#include <LiquidCrystal.h>
+
+// initialize the library by associating any needed LCD interface pin
+// with the arduino pin number it is connected to
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+//
+const int trigPin = 9;
+const int echoPin = 10;
+const int buzzer = 8;
+int potPin = analogRead(A0);   
+Servo myservo;  // create servo object to control a servo
+int pos = 0;    // variable to store the servo position
+int set1,set2=0;
+
+// defines variables
+long duration;
+int distance;
+void setup() {
+    // set up the LCD's number of columns and rows:
+  lcd.begin(20, 4);
+  // Print a message to the LCD.
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  pinMode(buzzer, OUTPUT); // Sets the echoPin as an Input
+  myservo.attach(7);  // attaches the servo on pin 9 to the servo object 
+  myservo.write(0);
+  Serial.begin(9600); // Starts the serial communication
+  }
+void loop() {
+
+ digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  //Turn off the buzzer
+  digitalWrite(buzzer, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  // Calculating the distance
+  distance= duration*0.034/2;
+  // Prints the distance on the Serial Monitor
+  Serial.print("Distance: ");
+  delay(100);
+  Serial.println(distance);
+  if(distance >=13)
+  {
+    digitalWrite(buzzer, HIGH);   // turn the buzzer on (HIGH is the voltage level)
+    delay(1000);                       // wait for a second
+    Serial.println("vacio");
+    
+  }
+  // potenciometro y servo
+  int SensorValue = analogRead(potPin);    
+  Serial.print(SensorValue);
+ 
+  if(SensorValue ==0){
+  
+  
+    myservo.write(90);              // tell servo to go to position in variable 'pos'
+    delay(1000);                       // waits 15ms for the servo to reach the position
+  //}
+  }
+  if(SensorValue ==1023){
+  
+ // for (pos = 90; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+    myservo.write(0);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+  //}
+
+  //pantalla
+    // Clears the trigPin
+    //  welcome screen
+  clearAllScreen();
+  set1=SensorValue*100.0/1023;
+  set2= 100-(distance*100.0/13);
+  firstScreenText(set1,set2);
+  delay(2000);
+  //
+
+ 
+  
+  }
+
+
+  //pantallafuncion
+  void clearLineScreen(int col, int row) {
+  if (col > 20) {
+    col = 20;
+  }
+  if (row > 4) {
+    row = 4;
+  }
+  lcd.setCursor(col, row);
+  for (int i=0; i<20; i++) {
+    lcd.print(' ');
+  }
+  
+}
+
+void clearAllScreen(){
+  clearLineScreen(0, 0);
+  clearLineScreen(0, 1);
+  clearLineScreen(0, 2);
+  clearLineScreen(0, 3);
+}
+  void firstScreenText(int setPointBowlPercent, int reserveFoodPercent) {
+  lcd.setCursor(0, 0);
+  lcd.print("[-----PET CARE-----]");
+  lcd.setCursor(0, 1);
+  lcd.print("--------------------");
+  lcd.setCursor(0, 2);
+  lcd.print("Setpoint bowl: " + String(setPointBowlPercent) + "%");
+  lcd.setCursor(0, 3);
+  lcd.print("Reserve: " + String(reserveFoodPercent) + "%");
+}
