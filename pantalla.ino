@@ -50,7 +50,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 void setup() {
   // set up the LCD's number of columns and rows:
-  lcd.begin(16, 3);
+  lcd.begin(20, 4);
   // Print a message to the LCD.
   lcd.print("hello, world!");
 }
@@ -58,11 +58,49 @@ void setup() {
 void loop() {
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
+
+  clearAllScreen();
   lcd.setCursor(0, 0);
   // print the number of seconds since reset:
-  lcd.print("Bienvenido  98%");
+  lcd.print("98% de alimento");
   lcd.setCursor(0, 1);
   lcd.print("3 dias con alimento");
   lcd.setCursor(0, 2);
-  lcd.print("8 hr ultimo cambio");  
+  lcd.print("8hr ultimo cambio");
+
+  lcd.setCursor(0, 3);
+  lcd.print("Dispensar: B1");  
+  delay(2000);
+  
+  // segunda pantalla
+  clearAllScreen();
+  lcd.setCursor(0, 0);
+  lcd.print("Dispensado inmediato");
+  lcd.setCursor(0, 2);
+  lcd.print("Aceptar: B1");
+  lcd.setCursor(0, 3);
+  lcd.print("Cancelar: B2");  
+  delay(5000);
+  
+}
+
+void clearLineScreen(int col, int row) {
+  if (col > 20) {
+    col = 20;
+  }
+  if (row > 4) {
+    row = 4;
+  }
+  lcd.setCursor(col, row);
+  for (int i=0; i<20; i++) {
+    lcd.print(' ');
+  }
+  
+}
+
+void clearAllScreen(){
+  clearLineScreen(0, 0);
+  clearLineScreen(0, 1);
+  clearLineScreen(0, 2);
+  clearLineScreen(0, 3);
 }
