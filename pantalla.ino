@@ -56,30 +56,15 @@ void setup() {
 }
 
 void loop() {
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
 
+  //  welcome screen
   clearAllScreen();
-  lcd.setCursor(0, 0);
-  // print the number of seconds since reset:
-  lcd.print("98% de alimento");
-  lcd.setCursor(0, 1);
-  lcd.print("3 dias con alimento");
-  lcd.setCursor(0, 2);
-  lcd.print("8hr ultimo cambio");
-
-  lcd.setCursor(0, 3);
-  lcd.print("Dispensar: B1");  
+  firstScreenText();
   delay(2000);
   
-  // segunda pantalla
+  // inmediate dispenser
   clearAllScreen();
-  lcd.setCursor(0, 0);
-  lcd.print("Dispensado inmediato");
-  lcd.setCursor(0, 2);
-  lcd.print("Aceptar: B1");
-  lcd.setCursor(0, 3);
-  lcd.print("Cancelar: B2");  
+  secondScreenText();
   delay(5000);
   
 }
@@ -103,4 +88,29 @@ void clearAllScreen(){
   clearLineScreen(0, 1);
   clearLineScreen(0, 2);
   clearLineScreen(0, 3);
+}
+
+void firstScreenText(int percentFood, int minutesFood) {
+  int hour, minutes, days;
+
+  lcd.setCursor(0, 0);
+  lcd.print(String(percentFood) + String("% de alimento"));
+  lcd.setCursor(0, 1);
+  lcd.print("Ultimo cambio:")
+  lcd.setCursor(0, 2);
+  minutes = minutesFood % 60;
+  hours = minutesFood / 60;
+  days = hours / 24;
+  lcd.print(String(days) + String(" dias"));
+  lcd.setCursor(0, 3);
+  lcd.print(String(hours) + ":" +  String(minutes) + String("Horas")); 
+}
+
+void secondScreenText() {
+  lcd.setCursor(0, 0);
+  lcd.print("Dispensado inmediato");
+  lcd.setCursor(0, 2);
+  lcd.print("Aceptar: B1");
+  lcd.setCursor(0, 3);
+  lcd.print("Cancelar: B2");    
 }
