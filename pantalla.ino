@@ -59,13 +59,8 @@ void loop() {
 
   //  welcome screen
   clearAllScreen();
-  firstScreenText();
+  firstScreenText(78.3, 67.8);
   delay(2000);
-  
-  // inmediate dispenser
-  clearAllScreen();
-  secondScreenText();
-  delay(5000);
   
 }
 
@@ -90,20 +85,15 @@ void clearAllScreen(){
   clearLineScreen(0, 3);
 }
 
-void firstScreenText(int percentFood, int minutesFood) {
-  int hour, minutes, days;
-
+void firstScreenText(int setPointBowlPercent, int reserveFoodPercent) {
   lcd.setCursor(0, 0);
-  lcd.print(String(percentFood) + String("% de alimento"));
+  lcd.print("[-----PET CARE-----]");
   lcd.setCursor(0, 1);
-  lcd.print("Ultimo cambio:")
+  lcd.print("--------------------");
   lcd.setCursor(0, 2);
-  minutes = minutesFood % 60;
-  hours = minutesFood / 60;
-  days = hours / 24;
-  lcd.print(String(days) + String(" dias"));
+  lcd.print("Setpoint bowl: " + String(setPointBowlPercent) + "%");
   lcd.setCursor(0, 3);
-  lcd.print(String(hours) + ":" +  String(minutes) + String("Horas")); 
+  lcd.print("Reserve: " + String(reserveFoodPercent) + "%");
 }
 
 void secondScreenText() {
